@@ -1,0 +1,60 @@
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://hv-camera-web-sg.s3-ap-southeast-1.amazonaws.com/hyperverge-web-sdk@3.3.5/src/sdk.min.js"></script>
+  </head>
+  <body>
+    <center><h2>Hyperverge WebSDK Demo</h2></center>
+    <div class="container">
+      <div class="form-group">
+        <button type="button" onclick="runOCR();" class="btn btn-primary">Run OCR</button>
+        <button type="button" onclick="runLiveness();" class="btn btn-primary">Run Face Liveness</button>
+      </div>
+      <div id="div1"></div>
+    </div>
+    <script>
+      // client calls the auth api to get the token from their backend server
+      var jwtToken = 'Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6ImJkMzQ5MCIsImhhc2giOiI3YmU5NDFjYWNkMGZkOTQ4MzY0MWI2ZTFlNTRkOTkyZDc3YTdhNWVjNWU5MWJiYTE5ZTQwMzI1ZjFmOTcxODNhIiwiaWF0IjoxNjQwNzM2NzAyLCJleHAiOjE2NDA3NDU3MDIsImp0aSI6ImFlNjZkODQ1LWQzYmItNDUxZC04Y2MxLTJhNTNmM2E4Y2ZmNCJ9.iKNHkOPoeGOH44hZeTJxPn4cbnwKkCwA9q-aCHHCbq4KrT9gV7Im80lrbpI_fIeBHTzubAQ6bmav0GcB5OK8-Yq_64Kh2MQSZC-JddFWlpGXtN5rd-3pzGUkfd1QOo-DyeW_UP888wAWoyiJiyoX38q2x4u-Emiqeem8XVtRitk'
+      HyperSnapSDK.init(jwtToken, HyperSnapParams.Region.India);
+      HyperSnapSDK.startUserSession();
+      var faceImage = '';
+      var docImage = '';
+      function runOCR() {
+        hvDocConfig = new HVDocConfig();
+        hvDocConfig.setOCRDetails(
+          'https://ind-docs.hyperverge.co/v2.0/readKYC',
+          hvDocConfig.DocumentSide.FRONT,
+          { },
+          { },
+        );
+        hvDocConfig.setShouldShowInstructionPage(true);
+        HVDocsModule.start(hvDocConfig, callback);
+      }
+      function runLiveness() {
+        hvFaceConfig = new HVFaceConfig();
+        hvFaceConfig.setShouldShowInstructionPage(true);
+        hvFaceConfig.setLivenessAPIParameters({
+          rejectFaceMask: 'yes',
+          allowEyesClosed: 'no',
+          allowMultipleFaces: 'no',
+        });
+        HVFaceModule.start(hvFaceConfig, callback);
+      }
+      callback = (HVError, HVResponse) => {
+        if (HVError) {
+          var para = document.createElement('p');
+          var node = document.createTextNode(JSON.stringify(HVError));
+          para.appendChild(node);
+          var element = document.getElementById('div1');
+          element.appendChild(para);
+        } else {
+          var para = document.createElement('p');
+          var node = document.createTextNode(JSON.stringify(HVResponse));
+          para.appendChild(node);
+          var element = document.getElementById('div1');
+          element.appendChild(para);
+        }
+      };
+    </script>
+  </body>
+</html>
